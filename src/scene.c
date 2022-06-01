@@ -4,9 +4,6 @@
 #include "result.h"
 #include "resource.h"
 
-ALLEGRO_EVENT_QUEUE *queue;
-ALLEGRO_DISPLAY *display;
-ALLEGRO_TIMER *timer;
 int scene_state;
 
 void scene_init() {
@@ -25,17 +22,17 @@ void scene_init() {
     al_init_font_addon();
     al_init_ttf_addon();
 
-    display = al_create_display(WIDTH, HEIGHT);
-    queue = al_create_event_queue();
-    timer = al_create_timer(1.0 / FPS);
+    scene_queue = al_create_event_queue();
+    scene_display = al_create_display(WIDTH, HEIGHT);
+    scene_timer = al_create_timer(1.0 / FPS);
 
-    al_set_window_title(display, "8_queens");
-    al_set_window_position(display, 0, 0);
+    al_set_window_title(scene_display, "8_queens");
+    al_set_window_position(scene_display, 0, 0);
 
-    al_register_event_source(queue, al_get_display_event_source(display));
-    al_register_event_source(queue, al_get_timer_event_source(timer));
-    al_register_event_source(queue, al_get_keyboard_event_source());
-    al_register_event_source(queue, al_get_mouse_event_source());
+    al_register_event_source(scene_queue, al_get_display_event_source(scene_display));
+    al_register_event_source(scene_queue, al_get_timer_event_source(scene_timer));
+    al_register_event_source(scene_queue, al_get_keyboard_event_source());
+    al_register_event_source(scene_queue, al_get_mouse_event_source());
 
     load_resource();
 }
@@ -43,22 +40,22 @@ void scene_init() {
 void scene_begin() {
     scene_state = SCENE_MENU;
     menu_init();
-    al_start_timer(timer);
+    al_start_timer(scene_timer);
 }
 
 void scene_destroy() {
-    al_destroy_display(display);
-    al_destroy_event_queue(queue);
-    al_destroy_timer(timer);
+    al_destroy_event_queue(scene_queue);
+    al_destroy_display(scene_display);
+    al_destroy_timer(scene_timer);
     destroy_resource();
 }
 
 int scene_run() {
     ALLEGRO_EVENT event;
-    al_wait_for_event(queue, &event);
+    al_wait_for_event(scene_queue, &event);
 
     // if the window was closed, then terminate the program
-    if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE && event.display.source == display) {
+    if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE && event.display.source == scene_display) {
         return MSG_TERMINATE;
     }
 
@@ -66,7 +63,7 @@ int scene_run() {
         return MSG_TERMINATE;
     }
 
-    if (event.type == ALLEGRO_EVENT_TIMER && event.timer.source == timer) {
+    if (event.type == ALLEGRO_EVENT_TIMER && event.timer.source == scene_timer) {
         scene_draw();
     }
 

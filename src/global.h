@@ -21,6 +21,11 @@ enum {
 extern const int WIDTH;
 extern const int HEIGHT;
 extern const double FPS;
+
+extern ALLEGRO_EVENT_QUEUE *scene_queue;
+extern ALLEGRO_DISPLAY *scene_display;
+extern ALLEGRO_TIMER *scene_timer;
+
 extern int key_left;
 extern int key_right;
 extern int key_up;

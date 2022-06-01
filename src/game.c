@@ -51,10 +51,14 @@ int game_process(ALLEGRO_EVENT event) {
         }
     }
 
-    ++player.frame;
-    if (player.state == PLAYER_ROLL && player.frame >= 21) {
-        player.state = PLAYER_IDLE;
-        player.frame = 0;
+    // only update frame count when the event is from the scene timer
+    // don't update for keyboard event
+    if (event.type == ALLEGRO_EVENT_TIMER && event.timer.source == scene_timer) {
+        ++player.frame;
+        if (player.state == PLAYER_ROLL && player.frame >= 21) {
+            player.state = PLAYER_IDLE;
+            player.frame = 0;
+        }
     }
 
     return MSG_NOPE;
