@@ -1,0 +1,27 @@
+#pragma once
+#include <stdio.h>
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+#include "../algif5/src/algif.h"
+
+enum {
+    MSG_TERMINATE,
+    MSG_NOPE,
+    MSG_GAME_START,
+    MSG_GAME_OVER,
+    MSG_GAME_RESTART,
+    MSG_BACK_TO_MENU
+};
+
+extern const int WIDTH;
+extern const int HEIGHT;
+extern const double FPS;
+extern int key_left;
+extern int key_right;
+extern int key_up;
+extern int key_down;
