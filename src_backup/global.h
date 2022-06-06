@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include <math.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
@@ -15,7 +16,8 @@ enum {
     MSG_GAME_START,
     MSG_GAME_OVER,
     MSG_GAME_RESTART,
-    MSG_BACK_TO_MENU
+    MSG_BACK_TO_MENU,
+    MSG_CHANGE_SETTING
 };
 
 extern const int WIDTH;
@@ -26,8 +28,9 @@ extern ALLEGRO_EVENT_QUEUE *scene_queue;
 extern ALLEGRO_DISPLAY *scene_display;
 extern ALLEGRO_TIMER *scene_timer;
 
-
 extern int key_left;
 extern int key_right;
 extern int key_up;
 extern int key_down;
+
+extern bool easter_egg_mode;
