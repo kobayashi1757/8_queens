@@ -25,6 +25,7 @@ void game_destroy() {}
 int game_process(ALLEGRO_EVENT event) {
     // button 1 is left click
     if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP && event.mouse.button == 1) {
+        al_play_sample_instance(click_se_spi);
         return MSG_GAME_OVER;
     }
 
@@ -43,6 +44,7 @@ int game_process(ALLEGRO_EVENT event) {
         }
 
         if (player.x != player.ox || player.y != player.oy) {
+            al_play_sample_instance(roll_se_spi);
             player.frame = 0;
             player.state = PLAYER_ROLL;
             if (player.x != player.ox) {

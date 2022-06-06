@@ -15,7 +15,8 @@ enum {
     MSG_GAME_START,
     MSG_GAME_OVER,
     MSG_GAME_RESTART,
-    MSG_BACK_TO_MENU
+    MSG_BACK_TO_MENU,
+    MSG_CHANGE_SETTING
 };
 
 extern const int WIDTH;

@@ -12,7 +12,11 @@ void menu_destroy() {}
 int menu_process(ALLEGRO_EVENT event) {
     // button 1 is left click
     if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP && event.mouse.button == 1) {
+        al_play_sample_instance(click_se_spi);
         return MSG_GAME_START;
+    } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP && event.mouse.button == 2) {
+        al_play_sample_instance(click_se_spi);
+        return MSG_CHANGE_SETTING;
     }
     return MSG_NOPE;
 }

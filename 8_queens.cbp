@@ -79,6 +79,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/scene.h" />
+		<Unit filename="src/setting.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/setting.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

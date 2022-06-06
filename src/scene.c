@@ -3,6 +3,7 @@
 #include "game.h"
 #include "result.h"
 #include "resource.h"
+#include "setting.h"
 
 int scene_state;
 
@@ -15,6 +16,7 @@ void scene_init() {
     // audio
     al_install_audio();
     al_init_acodec_addon();
+    al_restore_default_mixer();
     // primitives
     al_init_primitives_addon();
     // image & text
@@ -27,7 +29,7 @@ void scene_init() {
     scene_timer = al_create_timer(1.0 / FPS);
 
     al_set_window_title(scene_display, "8_queens");
-    al_set_window_position(scene_display, 0, 0);
+    al_set_window_position(scene_display, 500, 0);
 
     al_register_event_source(scene_queue, al_get_display_event_source(scene_display));
     al_register_event_source(scene_queue, al_get_timer_event_source(scene_timer));
@@ -41,6 +43,7 @@ void scene_begin() {
     scene_state = SCENE_MENU;
     menu_init();
     al_start_timer(scene_timer);
+    al_play_sample_instance(bgm_spi);
 }
 
 void scene_destroy() {
@@ -78,6 +81,10 @@ int scene_process(ALLEGRO_EVENT event) {
             menu_destroy();
             scene_state = SCENE_GAME;
             game_init();
+        } else if (msg == MSG_CHANGE_SETTING) {
+            menu_destroy();
+            scene_state = SCENE_SETTING;
+            setting_init();
         }
     } else if (scene_state == SCENE_GAME) {
         msg = game_process(event);
@@ -99,6 +106,13 @@ int scene_process(ALLEGRO_EVENT event) {
         } else if (msg == MSG_TERMINATE) {
             return MSG_TERMINATE;
         }
+    } else if (scene_state == SCENE_SETTING) {
+        msg = setting_process(event);
+        if (msg == MSG_BACK_TO_MENU) {
+            setting_destroy();
+            scene_state = SCENE_MENU;
+            menu_init();
+        }
     }
     return MSG_NOPE;
 }
@@ -110,6 +124,8 @@ void scene_draw() {
         game_draw();
     } else if (scene_state == SCENE_RESULT) {
         result_draw();
+    } else if (scene_state == SCENE_SETTING) {
+        setting_draw();
     }
     al_flip_display();
 }
