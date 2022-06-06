@@ -43,7 +43,7 @@ void scene_begin() {
     scene_state = SCENE_MENU;
     menu_init();
     al_start_timer(scene_timer);
-    al_play_sample_instance(bgm_spi);
+    al_play_sample_instance(eight_queens_bgm_spi);
 }
 
 void scene_destroy() {

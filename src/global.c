@@ -12,3 +12,5 @@ int key_left = ALLEGRO_KEY_LEFT;
 int key_right = ALLEGRO_KEY_RIGHT;
 int key_up = ALLEGRO_KEY_UP;
 int key_down = ALLEGRO_KEY_DOWN;
+
+bool easter_egg_mode = false;

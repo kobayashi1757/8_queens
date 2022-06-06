@@ -81,36 +81,28 @@ void game_draw() {
     }
 
     if (player.state == PLAYER_IDLE) {
-        al_draw_tinted_scaled_rotated_bitmap_region(
+        al_draw_scaled_bitmap(
             archer,
             64.0f*(player.frame / 10 % 4),
             64.0f*5,
             64.0f,
             64.0f,
-            al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f),
-            0.0f,
-            0.0f,
             player.x*unit,
             player.y*unit,
-            unit/64.0f,
-            unit/64.0f,
-            0.0f,
+            unit,
+            unit,
             player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
     } else {
-        al_draw_tinted_scaled_rotated_bitmap_region(
+        al_draw_scaled_bitmap(
             archer,
             64.0f*(player.frame / 3 % 7),
             64.0f*2,
             64.0f,
             64.0f,
-            al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f),
-            0.0f,
-            0.0f,
             (player.x*(player.frame/21.0f)+player.ox*(1-player.frame/21.0f))*unit,
             (player.y*(player.frame/21.0f)+player.oy*(1-player.frame/21.0f))*unit,
-            unit/64.0f,
-            unit/64.0f,
-            0.0f,
+            unit,
+            unit,
             player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
     }
 

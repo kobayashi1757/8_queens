@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include <math.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
@@ -31,3 +32,5 @@ extern int key_left;
 extern int key_right;
 extern int key_up;
 extern int key_down;
+
+extern bool easter_egg_mode;
