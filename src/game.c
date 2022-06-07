@@ -107,3 +107,24 @@ void game_draw() {
     }
 
 }
+
+// queens.c
+struct {
+    int board[8][8];
+    int counter; // ~300 到 0 扣血
+} queens;
+
+// timer event -> --counter;
+void queens_process(ALLEGRO_EVENT);
+
+// tell if counter == 0
+bool queens_attack();
+
+// player.c
+struct {
+    int life;
+} player;
+
+void player_process(ALLEGRO_EVENT);
+
+void rand_queens(int n) {}

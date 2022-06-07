@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
