@@ -79,13 +79,13 @@ void menu_draw() {
     // al_clear_to_color(al_map_rgb(200, 177, 177));
     // al_draw_text(pirulen_36, al_map_rgb(0, 0, 0), WIDTH/2, 450, ALLEGRO_ALIGN_CENTER, "This is menu");
     if(button_index == 0){
-        al_draw_scaled_bitmap(start_button, 0, 0, 1563, 1980, 0, 0, 750, 950, 0);
+        al_draw_scaled_bitmap(start_button, 0, 0, 1563, 1980, 0, 0, 760, 950, 0);
     }
     else if(button_index == 1){
-        al_draw_scaled_bitmap(setting_button, 0, 0, 1563, 1980, 0, 0, 750, 950, 0);
+        al_draw_scaled_bitmap(setting_button, 0, 0, 1563, 1980, 0, 0, 760, 950, 0);
     }
     else if(button_index == 2){
-        al_draw_scaled_bitmap(quit_button, 0, 0, 1563, 1980, 0, 0, 750, 950, 0);
+        al_draw_scaled_bitmap(quit_button, 0, 0, 1563, 1980, 0, 0, 760, 950, 0);
     }
     else if(button_index == 3){
         al_draw_scaled_bitmap(about_button, 0, 0, 1563, 1980, 0, 0, 750, 950, 0);
