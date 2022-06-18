@@ -3,6 +3,7 @@ obj/
 
 *.log
 *.exe
+*.dll
 
 # codeblocks
 *.depend

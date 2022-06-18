@@ -5,7 +5,8 @@ enum {
     SCENE_MENU,
     SCENE_GAME,
     SCENE_RESULT,
-    SCENE_SETTING
+    SCENE_SETTING,
+    SCENE_ABOUT
 };
 
 void scene_init();

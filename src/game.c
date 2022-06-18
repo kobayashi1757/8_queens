@@ -1,173 +1,253 @@
 #include "game.h"
 #include "resource.h"
 
-enum { PLAYER_IDLE, PLAYER_ROLL,PLAYER_DIE };
+enum { PLAYER_IDLE, PLAYER_ROLL, PLAYER_DIE };
 enum { DIR_LEFT, DIR_RIGHT };
 
 struct {
-    float x;
-    float y;
-    float ox;
-    float oy;
+    int x;
+    int y;
+    int ox;
+    int oy;
     int frame;
     int state;
     int dir;
-    int HP; // 血量
+    int HP;
 } player;
 
+// by art
 double j_idle_begin_time;
-int heart_size;
-int number;
-int die_count_trigger;
+double game_begin_time;
 float die_count_begin;
 
+// by player
+int generator_speed = 180;//生成速度，180楨刷新一波
+int counter;
+int queens_num;
+
 void game_init() {
-    player.HP = 3;
-    player.x = 0.4; // 放大要調整
-    player.y = 2.9; // 放大要調整
-    player.frame = 0;
+    // by art
+    j_idle_begin_time = al_get_time();
+    game_begin_time = al_get_time();
+
+    // by player
+    player.x = player.y = player.frame = 0;
     player.state = PLAYER_IDLE;
     player.dir = DIR_RIGHT;
-    j_idle_begin_time = al_get_time();
-    
+    player.HP = 3;
+
+    counter = generator_speed;
+    queens_num = 1;
 }
 
 void game_destroy() {}
 
 int game_process(ALLEGRO_EVENT event) {
-    if (player.HP == 0) {
-        player.state = PLAYER_DIE;
-        if(!die_count_trigger){
-            die_count_begin = al_get_time();
-            die_count_trigger++;
-        }
-        if(al_get_time() - die_count_begin >= 2){
+    if (player.state == PLAYER_DIE) {
+        if (al_get_time() - die_count_begin >= 2) {
             return MSG_GAME_OVER;
         }
+        return MSG_NOPE;
     }
 
+    // 測試血量顯示
+    if (event.type == ALLEGRO_KEY_DOWN &&
+        event.keyboard.keycode == ALLEGRO_KEY_W &&
+        player.HP > 0) {
+        --player.HP;
+    }
+
+    // player idle
     if (event.type == ALLEGRO_EVENT_KEY_DOWN && player.state == PLAYER_IDLE) {
         player.ox = player.x;
         player.oy = player.y;
 
-        // 測試血量顯示
-        if( event.keyboard.keycode == ALLEGRO_KEY_W && player.HP > 0 ){
-            --player.HP;
-        }
-        if (event.keyboard.keycode == key_left && player.x > 1.3) {
+        if (event.keyboard.keycode == key_left && player.x > 0) {
             --player.x;
         } else if (event.keyboard.keycode == key_right && player.x < 7) {
             ++player.x;
-        } else if (event.keyboard.keycode == key_up && player.y > 3.0) {
+        } else if (event.keyboard.keycode == key_up && player.y > 0) {
             --player.y;
-        } else if (event.keyboard.keycode == key_down && player.y < 9) {
+        } else if (event.keyboard.keycode == key_down && player.y < 7) {
             ++player.y;
         }
 
         if (player.x != player.ox || player.y != player.oy) {
-            player.frame = 0; // 不懂
             player.state = PLAYER_ROLL;
+            player.frame = 0;
             if (player.x != player.ox) {
                 player.dir = (player.x < player.ox) ? DIR_LEFT : DIR_RIGHT;
             }
+            al_stop_sample_instance(jump_spi);
+            al_play_sample_instance(jump_spi);
         }
     }
 
     // only update frame count when the event is from the scene timer
     // don't update for keyboard event
     if (event.type == ALLEGRO_EVENT_TIMER && event.timer.source == scene_timer) {
-        ++player.frame;
+        player.frame++;
         if (player.state == PLAYER_ROLL && player.frame >= 21) {
             player.state = PLAYER_IDLE;
             player.frame = 0;
+        }
+
+        counter--;
+        if (counter == 150) {
+            //生成皇后
+            //變數可以調整，要隨著時間調整也行
+            queens_process(1 + queens_num / 5);
+        } else if (counter == 20) {
+            al_stop_sample_instance(lightning_spi);
+            al_play_sample_instance(lightning_spi);
+        } else if (counter == 0) {
+            //判斷扣血
+            if (player.state == PLAYER_IDLE && board[player.x][player.y] >= 1) {
+                player.HP--;
+            } else if (player.state == PLAYER_ROLL) {
+                if (player.frame < 21 / 2 && board[player.ox][player.oy] >= 1) {
+                    player.HP--;
+                } else if (player.frame >= 21 / 2 && board[player.x][player.y] >= 1) {
+                    player.HP--;
+                }
+            }
+
+            if (player.state != PLAYER_DIE && player.HP == 0) {
+                player.state = PLAYER_DIE;
+                die_count_begin = al_get_time();
+                al_play_sample_instance(dead_sound_spi);
+            }
+
+            //清空皇后
+            for(int i=0; i<8; i++){
+                for(int j=0; j<8; j++){
+                    board[i][j] = 0;
+                }
+            }
+            queens_num++;
+            counter = generator_speed; //counter重製
         }
     }
 
     return MSG_NOPE;
 }
 
-void game_draw() {
-    float unit = WIDTH / 8-8.8; // 如果調視窗大小，要重調
-    al_draw_bitmap(GBI, 0, 0, 0); // 這個是背景buffer
-    // 學長的手繪棋盤
-    // for (int i=0; i<8; ++i) {
-    //     for (int j=0; j<8; ++j) {
-    //         al_draw_filled_rectangle(
-    //             i*unit,
-    //             j*unit,
-    //             (i+1)*unit,
-    //             (j+1)*unit,
-    //             (i+j)%2 ? al_map_rgb(245, 227, 205) : al_map_rgb(176, 122, 76));
-    //     }
-    // }
-    
-
-    if (player.state == PLAYER_IDLE) {
-        al_draw_bitmap(algif_get_bitmap(JI_gif, al_get_time() - j_idle_begin_time), player.x*unit,player.y*unit,player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0 );
-        // 學長的幀數idle
-        // al_draw_tinted_scaled_rotated_bitmap_region(
-        //     archer,
-        //     64.0f*(player.frame / 10 % 4),
-        //     64.0f*5,
-        //     64.0f,
-        //     64.0f,
-        //     al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f),
-        //     0.0f,
-        //     0.0f,
-        //     player.x*unit,
-        //     player.y*unit,
-        //     unit/64.0f,
-        //     unit/64.0f,
-        //     0.0f,
-        //     player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
-    } else if(player.state == PLAYER_ROLL){
-        al_draw_bitmap(algif_get_bitmap(JJ_gif, al_get_time() - j_idle_begin_time), (player.x*(player.frame/21.0f)+player.ox*(1-player.frame/21.0f))*unit,(player.y*(player.frame/21.0f)+player.oy*(1-player.frame/21.0f))*unit, player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
-        al_play_sample_instance(lightning_spi);
-        // 學長的幀數移動
-        // al_draw_tinted_scaled_rotated_bitmap_region(
-        //     archer,
-        //     64.0f*(player.frame / 3 % 7),
-        //     64.0f*2,
-        //     64.0f,
-        //     64.0f,
-        //     al_map_rgba_f(1.0f, 1.0f, 1.0f, 1.0f),
-        //     0.0f,
-        //     0.0f,
-        //     (player.x*(player.frame/21.0f)+player.ox*(1-player.frame/21.0f))*unit, 這個是目標x
-        //     (player.y*(player.frame/21.0f)+player.oy*(1-player.frame/21.0f))*unit, 這個是目標y
-        //     unit/64.0f,
-        //     unit/64.0f,
-        //     0.0f,
-        //     player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0); 這個是左右判定
-    }else if(player.state == PLAYER_DIE){
-        al_play_sample_instance(dead_sound_spi);
-        if(al_get_time() - die_count_begin <= 0.5){
-            al_draw_bitmap(algif_get_bitmap(JD_gif, al_get_time() - j_idle_begin_time), (player.x*(player.frame/21.0f)+player.ox*(1-player.frame/21.0f))*unit,(player.y*(player.frame/21.0f)+player.oy*(1-player.frame/21.0f))*unit, player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
+void queens_process(int n) {
+    int x, y, num;
+    for(int i=0; i<n; i++){
+        num = rand() % 64;
+        x = num / 8;
+        y = num % 8;
+        for(int col=0;col<8;col++){
+            board[y][col]++;
         }
-        if(al_get_time() - die_count_begin >= 0.5){
-            al_draw_bitmap(JD_stop,(player.x*(player.frame/21.0f)+player.ox*(1-player.frame/21.0f))*unit,(player.y*(player.frame/21.0f)+player.oy*(1-player.frame/21.0f))*unit,player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
+        for(int row=0;row<8;row++){
+            board[row][x]++;
+            for(int col=0;col<8;col++){
+                if(row+col==x+y||row-col==y-x){
+                    board[row][col]++;
+                }
+            }
+        }//只要有攻擊到就+1
+        board[y][x]=100;//rand之後把有皇后的點的值改為30
+    }
+}
+
+void game_draw() {
+    const float unit = 86;
+    const float dx = 33;
+    const float dy = 241;
+
+    al_draw_bitmap(GBI, 0, 0, 0); // 這個是背景buffer
+
+    // draw queens
+    for (int i=0; i<8; ++i) {
+        for (int j=0; j<8; ++j) {
+            if(board[i][j] >=1 && board[i][j] < 20) {
+                if (counter < 21) {
+                    al_draw_bitmap(
+                        algif_get_bitmap(Lightening_gif, al_get_time()),
+                        dx + i*unit,
+                        dy + j*unit,
+                        0
+                    );
+                } else if (counter <= 150) {
+                    const int upper_bound = unit / 2 - 3;
+                    const int lower_bound = unit / 2 - 10;
+                    float a = (sin(al_get_time() * 8) + 1) / 2;
+                    float r = lower_bound + (upper_bound - lower_bound) * a;
+                    al_draw_filled_rectangle(
+                        dx + (i+0.5)*unit - r,
+                        dy + (j+0.5)*unit - r,
+                        dx + (i+0.5)*unit + r,
+                        dy + (j+0.5)*unit + r,
+                        al_map_rgba(255, 0, 0, 200)
+                    );
+                }
+            }
+            if (board[i][j] >= 90) {
+                al_draw_scaled_bitmap(
+                    algif_get_bitmap(Queen_gif, al_get_time()),
+                    0,
+                    0,
+                    480,
+                    480,
+                    dx + i*unit,
+                    dy + j*unit,
+                    unit,
+                    unit,
+                    0
+                );
+            }
         }
     }
+
+    // draw player
+    if (player.state == PLAYER_IDLE) {
+        al_draw_bitmap(
+            algif_get_bitmap(JI_gif, al_get_time() - j_idle_begin_time),
+            dx + player.x*unit,
+            dy + player.y*unit,
+            player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
+    } else if(player.state == PLAYER_ROLL){
+        al_draw_bitmap(
+            algif_get_bitmap(JJ_gif, al_get_time() - j_idle_begin_time),
+            dx + (player.x*(player.frame/21.0)+player.ox*(1-player.frame/21.0))*unit,
+            dy + (player.y*(player.frame/21.0)+player.oy*(1-player.frame/21.0))*unit,
+            player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
+    } else if(player.state == PLAYER_DIE) {
+        if (al_get_time() - die_count_begin <= 0.5){
+            al_draw_bitmap(
+                algif_get_bitmap(JD_gif, al_get_time() - die_count_begin),
+                dx + player.x*unit,
+                dy + player.y*unit,
+                player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
+        } else {
+            al_draw_bitmap(
+                JD_stop,
+                dx + player.x*unit,
+                dy + player.y*unit,
+                player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
+        }
+    }
+
     heart_draw();
     score_draw();
 }
 
-void heart_draw(){
-    heart_size = 60;
-    if(player.HP >= 1){
+void heart_draw() {
+    const int heart_size = 60;
+    if (player.HP >= 1)
         al_draw_scaled_bitmap(heart, 0, 0, 22, 23, 50, 50, heart_size, heart_size, 0);
-    }
-    if(player.HP >= 2){
+    if (player.HP >= 2)
         al_draw_scaled_bitmap(heart, 0,0 , 22, 23, 120, 50, heart_size, heart_size, 0);
-    }
-    if(player.HP >= 3){
+    if (player.HP >= 3)
         al_draw_scaled_bitmap(heart, 0,0 , 22, 23, 190, 50, heart_size, heart_size, 0);
-    }
 }
 
-void score_draw(){
-    if(player.HP>0){
-        number = al_get_time() - j_idle_begin_time;
+void score_draw() {
+    if (player.HP > 0) {
+        number = al_get_time() - game_begin_time;
     }
-    al_draw_textf(score, al_map_rgb(255,255,255), 400,55, ALLEGRO_ALIGN_LEFT,  "Score: %3d",number);
+    al_draw_textf(score, al_map_rgb(255,255,255), 400, 55, ALLEGRO_ALIGN_LEFT,  "Score: %3d", number);
 }

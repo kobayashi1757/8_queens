@@ -4,6 +4,7 @@
 #include "result.h"
 #include "resource.h"
 #include "setting.h"
+#include "about.h"
 
 int scene_state;
 
@@ -37,7 +38,7 @@ void scene_init() {
     al_register_event_source(scene_queue, al_get_mouse_event_source());
 
     load_resource();
-    
+    srand(time(NULL));
 }
 
 void scene_begin() {
@@ -70,7 +71,7 @@ int scene_run() {
         scene_draw();
     }
     return MSG_NOPE;
-    
+
 }
 
 int scene_process(ALLEGRO_EVENT event) {
@@ -86,8 +87,12 @@ int scene_process(ALLEGRO_EVENT event) {
             menu_destroy();
             scene_state = SCENE_SETTING;
             setting_init();
-        }else if (msg == MSG_TERMINATE) {
+        } else if (msg == MSG_TERMINATE) {
             return MSG_TERMINATE;
+        } else if (msg == MSG_ABOUT) {
+            menu_destroy();
+            scene_state = SCENE_ABOUT;
+            about_init();
         }
     } else if (scene_state == SCENE_GAME) {
         msg = game_process(event);
@@ -116,12 +121,19 @@ int scene_process(ALLEGRO_EVENT event) {
             scene_state = SCENE_MENU;
             menu_init();
         }
+    } else if (scene_state == SCENE_ABOUT) {
+        msg = about_process(event);
+        if (msg == MSG_BACK_TO_MENU) {
+            about_destroy();
+            scene_state = SCENE_MENU;
+            menu_init();
+        }
     }
     return MSG_NOPE;
 }
 
 void scene_draw() {
-    if (scene_state == SCENE_MENU) {  
+    if (scene_state == SCENE_MENU) {
         menu_draw();
     } else if (scene_state == SCENE_GAME) {
         game_draw();
@@ -129,6 +141,8 @@ void scene_draw() {
         result_draw();
     } else if (scene_state == SCENE_SETTING) {
         setting_draw();
+    } else if (scene_state == SCENE_ABOUT) {
+        about_draw();
     }
     al_flip_display();
 }

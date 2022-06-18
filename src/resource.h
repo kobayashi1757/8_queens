@@ -6,11 +6,12 @@ extern ALGIF_ANIMATION *chess_gif;
 extern ALLEGRO_BITMAP *archer;
 extern ALLEGRO_BITMAP *GBI; // Game Basic Interface
 extern ALLEGRO_BITMAP *heart; // HP heart
-extern ALGIF_ANIMATION *JI_gif; // Johnny Idle 
-extern ALGIF_ANIMATION *JD_gif; // Johnny dead 
-extern ALGIF_ANIMATION *JH_gif; // Johnny hurt 
+extern ALGIF_ANIMATION *JI_gif; // Johnny Idle
+extern ALGIF_ANIMATION *JD_gif; // Johnny dead
+extern ALGIF_ANIMATION *JH_gif; // Johnny hurt
 extern ALGIF_ANIMATION *JJ_gif; // Johnny jump
-extern ALGIF_ANIMATION *Queen_gif; // Queen 
+extern ALGIF_ANIMATION *Queen_gif; // Queen
+extern ALGIF_ANIMATION *Lightening_gif; // Lightning
 extern ALLEGRO_FONT *score;
 extern ALLEGRO_FONT *result_score;
 extern ALLEGRO_BITMAP *infinite_png;
@@ -23,6 +24,7 @@ extern ALLEGRO_BITMAP *setting_button;
 extern ALLEGRO_BITMAP *remenu_button;
 extern ALLEGRO_BITMAP *restart_button;
 extern ALLEGRO_BITMAP *requit_button;
+extern ALLEGRO_BITMAP *about;
 
 extern float bgm_gain;
 extern float se_gain;

@@ -15,3 +15,6 @@ int key_up = ALLEGRO_KEY_UP;
 int key_down = ALLEGRO_KEY_DOWN;
 
 bool easter_egg_mode = false;
+
+int board[8][8];
+int number = 0; // use as score

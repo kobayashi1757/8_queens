@@ -1,6 +1,7 @@
 #include "result.h"
 #include "resource.h"
 #include "game.h"
+
 int re_button_index = 0;
 void result_init() {}
 
@@ -20,30 +21,20 @@ int result_process(ALLEGRO_EVENT event) {
         }
         if (event.keyboard.keycode == ALLEGRO_KEY_ENTER && re_button_index == 0) {
             al_play_sample_instance(click_se_spi);
+            al_stop_sample_instance(dead_sound_spi);
             return MSG_GAME_RESTART;
         } else if (event.keyboard.keycode == ALLEGRO_KEY_ENTER && re_button_index == 1) {
             al_play_sample_instance(click_se_spi);
+            al_stop_sample_instance(dead_sound_spi);
             return MSG_TERMINATE;
         }else if (event.keyboard.keycode == ALLEGRO_KEY_ENTER && re_button_index == 2) {
             al_play_sample_instance(click_se_spi);
+            al_stop_sample_instance(dead_sound_spi);
             return MSG_BACK_TO_MENU;
         }
-        
+
     }
-    // if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-    //     // button 1 is left click
-    //     if (event.mouse.button == 1) {
-    //         return MSG_GAME_RESTART;
-    //     }
-    //     // button 2 is right click
-    //     if (event.mouse.button == 2) {
-    //         return MSG_BACK_TO_MENU;
-    //     }
-    //     // button 3 is middle click
-    //     if (event.mouse.button == 3) {
-    //         return MSG_TERMINATE;
-    //     }
-    // }
+
     return MSG_NOPE;
 }
 
