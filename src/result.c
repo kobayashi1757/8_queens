@@ -1,93 +1,54 @@
 #include "result.h"
 #include "resource.h"
+#include "game.h"
 
-int result_count;
-
-struct {
-    int a;
-    int b;
-    int c;
-    int p;
-} rate;
-
-void result_init() {
-    for (int i=0; i<heart_gif->frames_count; ++i) {
-        printf("frame[%2d].duration = %d\n", i, heart_gif->frames[i].duration);
-    }
-
-    result_count = 0;
-    rate.a = 3;
-    rate.b = 6;
-    rate.c = 12;
-    rate.p = rate.a * rate.b * rate.c * heart_gif->frames_count;
-}
+int re_button_index = 0;
+void result_init() {}
 
 void result_destroy() {}
 
 int result_process(ALLEGRO_EVENT event) {
-    if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-        // button 1 is left click
-        if (event.mouse.button == 1) {
-            al_play_sample_instance(click_se_spi);
-            return MSG_GAME_RESTART;
+    if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+        if(event.keyboard.keycode == ALLEGRO_KEY_DOWN){
+            if(re_button_index <= 1){
+                re_button_index++;
+            }
         }
-        // button 2 is left click
-        if (event.mouse.button == 2) {
+        if(event.keyboard.keycode == ALLEGRO_KEY_UP){
+            if(re_button_index>0){
+                re_button_index--;
+            }
+        }
+        if (event.keyboard.keycode == ALLEGRO_KEY_ENTER && re_button_index == 0) {
             al_play_sample_instance(click_se_spi);
+            al_stop_sample_instance(dead_sound_spi);
+            return MSG_GAME_RESTART;
+        } else if (event.keyboard.keycode == ALLEGRO_KEY_ENTER && re_button_index == 1) {
+            al_play_sample_instance(click_se_spi);
+            al_stop_sample_instance(dead_sound_spi);
+            return MSG_TERMINATE;
+        }else if (event.keyboard.keycode == ALLEGRO_KEY_ENTER && re_button_index == 2) {
+            al_play_sample_instance(click_se_spi);
+            al_stop_sample_instance(dead_sound_spi);
             return MSG_BACK_TO_MENU;
         }
-        // button 3 is middle click
-        if (event.mouse.button == 3) {
-            al_play_sample_instance(click_se_spi);
-            return MSG_TERMINATE;
-        }
-    }
 
-    if (event.type == ALLEGRO_EVENT_TIMER && event.timer.source == scene_timer) {
-        result_count = (result_count + 1) % rate.p;
     }
 
     return MSG_NOPE;
 }
 
 void result_draw() {
-    al_clear_to_color(al_map_rgb(255, 255, 200));
-
-    int size = 200;
-
-    al_draw_scaled_bitmap(
-        algif_get_frame_bitmap(heart_gif, (result_count / rate.a) % heart_gif->frames_count),
-        0,
-        0,
-        heart_gif->width,
-        heart_gif->height,
-        (WIDTH - size) / 2,
-        (HEIGHT - size) / 2 - size,
-        size,
-        size,
-        0);
-
-    al_draw_scaled_bitmap(
-        algif_get_frame_bitmap(heart_gif, (result_count / rate.b) % heart_gif->frames_count),
-        0,
-        0,
-        heart_gif->width,
-        heart_gif->height,
-        (WIDTH - size) / 2,
-        (HEIGHT - size) / 2,
-        size,
-        size,
-        0);
-
-    al_draw_scaled_bitmap(
-        algif_get_frame_bitmap(heart_gif, (result_count / rate.c) % heart_gif->frames_count),
-        0,
-        0,
-        heart_gif->width,
-        heart_gif->height,
-        (WIDTH - size) / 2,
-        (HEIGHT - size) / 2 + size,
-        size,
-        size,
-        0);
+    // al_clear_to_color(al_map_rgb(255, 255, 200));
+    // al_draw_text(pirulen_36, al_map_rgb(0, 0, 0), WIDTH/2, HEIGHT/2, ALLEGRO_ALIGN_CENTER, "This is result");
+    if(re_button_index == 0){
+        al_draw_scaled_bitmap(restart_button, 0, 0, 1563, 1980, 0, 0, 760, 950, 0);
+    }
+    else if(re_button_index == 1){
+        al_draw_scaled_bitmap(requit_button, 0, 0, 1563, 1980, 0, 0, 760, 950, 0);
+    }
+    else if(re_button_index == 2){
+        al_draw_scaled_bitmap(remenu_button, 0, 0, 1563, 1980, 0, 0, 760, 950, 0);
+    }
+    al_draw_textf(result_score, al_map_rgb(255,255,255), 350,250, ALLEGRO_ALIGN_CENTER,  "%3d",number);
 }

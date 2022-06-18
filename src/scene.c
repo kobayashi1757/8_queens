@@ -4,6 +4,7 @@
 #include "result.h"
 #include "resource.h"
 #include "setting.h"
+#include "about.h"
 
 int scene_state;
 
@@ -37,6 +38,7 @@ void scene_init() {
     al_register_event_source(scene_queue, al_get_mouse_event_source());
 
     load_resource();
+    srand(time(NULL));
 }
 
 void scene_begin() {
@@ -56,7 +58,6 @@ void scene_destroy() {
 int scene_run() {
     ALLEGRO_EVENT event;
     al_wait_for_event(scene_queue, &event);
-
     // if the window was closed, then terminate the program
     if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE && event.display.source == scene_display) {
         return MSG_TERMINATE;
@@ -69,14 +70,15 @@ int scene_run() {
     if (event.type == ALLEGRO_EVENT_TIMER && event.timer.source == scene_timer) {
         scene_draw();
     }
-
     return MSG_NOPE;
+
 }
 
 int scene_process(ALLEGRO_EVENT event) {
     int msg;
     if (scene_state == SCENE_MENU) {
         msg = menu_process(event);
+        // printf("final\n");
         if (msg == MSG_GAME_START) {
             menu_destroy();
             scene_state = SCENE_GAME;
@@ -85,6 +87,12 @@ int scene_process(ALLEGRO_EVENT event) {
             menu_destroy();
             scene_state = SCENE_SETTING;
             setting_init();
+        } else if (msg == MSG_TERMINATE) {
+            return MSG_TERMINATE;
+        } else if (msg == MSG_ABOUT) {
+            menu_destroy();
+            scene_state = SCENE_ABOUT;
+            about_init();
         }
     } else if (scene_state == SCENE_GAME) {
         msg = game_process(event);
@@ -113,6 +121,13 @@ int scene_process(ALLEGRO_EVENT event) {
             scene_state = SCENE_MENU;
             menu_init();
         }
+    } else if (scene_state == SCENE_ABOUT) {
+        msg = about_process(event);
+        if (msg == MSG_BACK_TO_MENU) {
+            about_destroy();
+            scene_state = SCENE_MENU;
+            menu_init();
+        }
     }
     return MSG_NOPE;
 }
@@ -126,6 +141,8 @@ void scene_draw() {
         result_draw();
     } else if (scene_state == SCENE_SETTING) {
         setting_draw();
+    } else if (scene_state == SCENE_ABOUT) {
+        about_draw();
     }
     al_flip_display();
 }

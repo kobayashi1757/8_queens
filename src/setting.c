@@ -19,6 +19,7 @@ void setting_init() {
     selected = 0;
     key_left_pressed = false;
     key_right_pressed = false;
+    
 }
 
 void setting_destroy() {}
