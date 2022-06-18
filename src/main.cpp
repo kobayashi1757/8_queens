@@ -18,7 +18,8 @@ int main(int argc, char **argv){
     scene_init();
     scene_begin();
     int msg;
-    while ((msg = scene_run()) != MSG_TERMINATE) {
+    int over;
+    while ((msg = scene_run()) != MSG_TERMINATE ) {
         ;
     }
     scene_destroy();

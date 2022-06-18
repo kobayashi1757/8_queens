@@ -1,7 +1,7 @@
 #include "game.h"
 #include "resource.h"
 
-enum { PLAYER_IDLE, PLAYER_ROLL };
+enum { PLAYER_IDLE, PLAYER_ROLL,PLAYER_DIE };
 enum { DIR_LEFT, DIR_RIGHT };
 
 struct {
@@ -18,6 +18,8 @@ struct {
 double j_idle_begin_time;
 int heart_size;
 int number;
+int die_count_trigger;
+float die_count_begin;
 
 void game_init() {
     player.HP = 3;
@@ -33,9 +35,15 @@ void game_init() {
 void game_destroy() {}
 
 int game_process(ALLEGRO_EVENT event) {
-    // button 1 is left click
-    if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP && event.mouse.button == 1) {
-        return MSG_GAME_OVER;
+    if (player.HP == 0) {
+        player.state = PLAYER_DIE;
+        if(!die_count_trigger){
+            die_count_begin = al_get_time();
+            die_count_trigger++;
+        }
+        if(al_get_time() - die_count_begin >= 2){
+            return MSG_GAME_OVER;
+        }
     }
 
     if (event.type == ALLEGRO_EVENT_KEY_DOWN && player.state == PLAYER_IDLE) {
@@ -112,8 +120,9 @@ void game_draw() {
         //     unit/64.0f,
         //     0.0f,
         //     player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
-    } else {
+    } else if(player.state == PLAYER_ROLL){
         al_draw_bitmap(algif_get_bitmap(JJ_gif, al_get_time() - j_idle_begin_time), (player.x*(player.frame/21.0f)+player.ox*(1-player.frame/21.0f))*unit,(player.y*(player.frame/21.0f)+player.oy*(1-player.frame/21.0f))*unit, player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
+        al_play_sample_instance(lightning_spi);
         // 學長的幀數移動
         // al_draw_tinted_scaled_rotated_bitmap_region(
         //     archer,
@@ -130,6 +139,14 @@ void game_draw() {
         //     unit/64.0f,
         //     0.0f,
         //     player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0); 這個是左右判定
+    }else if(player.state == PLAYER_DIE){
+        al_play_sample_instance(dead_sound_spi);
+        if(al_get_time() - die_count_begin <= 0.5){
+            al_draw_bitmap(algif_get_bitmap(JD_gif, al_get_time() - j_idle_begin_time), (player.x*(player.frame/21.0f)+player.ox*(1-player.frame/21.0f))*unit,(player.y*(player.frame/21.0f)+player.oy*(1-player.frame/21.0f))*unit, player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
+        }
+        if(al_get_time() - die_count_begin >= 0.5){
+            al_draw_bitmap(JD_stop,(player.x*(player.frame/21.0f)+player.ox*(1-player.frame/21.0f))*unit,(player.y*(player.frame/21.0f)+player.oy*(1-player.frame/21.0f))*unit,player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
+        }
     }
     heart_draw();
     score_draw();
@@ -149,8 +166,8 @@ void heart_draw(){
 }
 
 void score_draw(){
-    number = al_get_time() - j_idle_begin_time;
-    // number = number*10;
+    if(player.HP>0){
+        number = al_get_time() - j_idle_begin_time;
+    }
     al_draw_textf(score, al_map_rgb(255,255,255), 400,55, ALLEGRO_ALIGN_LEFT,  "Score: %3d",number);
-
 }
