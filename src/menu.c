@@ -88,7 +88,7 @@ void menu_draw() {
         al_draw_scaled_bitmap(quit_button, 0, 0, 1563, 1980, 0, 0, 760, 950, 0);
     }
     else if(button_index == 3){
-        al_draw_scaled_bitmap(about_button, 0, 0, 1563, 1980, 0, 0, 750, 950, 0);
+        al_draw_scaled_bitmap(about_button, 0, 0, 1563, 1980, 0, 0, 760, 950, 0);
     }
     al_draw_scaled_rotated_bitmap(infinite_png, 62.5f, 62.5f, 220.0f, 210.0f,0.5,0.5, -easter_egg.angle, 0);
     al_draw_scaled_bitmap(queen_text, 0, 0,730,730,240,30,385,385, 0);
