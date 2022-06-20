@@ -11,6 +11,8 @@ ALGIF_ANIMATION *JH_gif;
 ALGIF_ANIMATION *JJ_gif;
 ALGIF_ANIMATION *Queen_gif;
 ALGIF_ANIMATION *Lightening_gif;
+ALGIF_ANIMATION *candy_gif;
+ALGIF_ANIMATION *warn_gif;
 ALLEGRO_FONT *score;
 ALLEGRO_FONT *result_score;
 ALLEGRO_BITMAP *start_button;
@@ -68,6 +70,8 @@ void load_resource() {
     JJ_gif = algif_load_animation("res/image/Johnny_jump.gif"); //Johnny jump
     Queen_gif = algif_load_animation("res/image/queen2.gif"); // queen idle
     Lightening_gif = algif_load_animation("res/image/Lightening.gif"); // Lightening
+    candy_gif = algif_load_animation("res/image/candy.gif");
+    warn_gif = algif_load_animation("res/image/warning.gif");
     heart = al_load_bitmap("res/image/heart.png");
     score = al_load_ttf_font("res/font/pirulen.ttf", 40, 0);
     result_score = al_load_ttf_font("res/font/pirulen.ttf", 80, 0);

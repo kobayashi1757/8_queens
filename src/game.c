@@ -19,6 +19,7 @@ struct {
 double j_idle_begin_time;
 double game_begin_time;
 float die_count_begin;
+int gif_count = 0;
 
 // by player
 int generator_speed = 180;//生成速度，180楨刷新一波
@@ -93,15 +94,16 @@ int game_process(ALLEGRO_EVENT event) {
             player.frame = 0;
         }
 
+        gif_count++;
+
         counter--;
         if (counter == 150) {
             //生成皇后
             //變數可以調整，要隨著時間調整也行
             queens_process(1 + queens_num / 8);
             //candy
-            if(number%5==0)
-                candy_process();
-
+            //if(number%5==0)
+            candy_process();
         } else if (counter == 20) {
             al_stop_sample_instance(lightning_spi);
             al_play_sample_instance(lightning_spi);
@@ -199,16 +201,28 @@ void game_draw() {
 
                     //mode
                     if(easter_egg_mode){
+                        /*
                         al_draw_filled_rectangle(
                             dx + (i+0.5)*unit - r,
                             dy + (j+0.5)*unit - r,
                             dx + (i+0.5)*unit + r,
                             dy + (j+0.5)*unit + r,
                             al_map_rgba(255, 0, 0, 200)
+                        );*/
+                        al_draw_scaled_bitmap(
+                            algif_get_frame_bitmap(
+                                warn_gif,
+                                gif_count / 6 % warn_gif->frames_count),
+                            200,
+                            203,
+                            94,
+                            94,
+                            dx + i*unit,
+                            dy + j*unit,
+                            unit,
+                            unit,
+                            0
                         );
-                    }
-                    else {
-
                     }
                 }
             }
@@ -228,12 +242,19 @@ void game_draw() {
             }
             //畫candy
             if (board[i][j] < 0) {
-                al_draw_bitmap(
-                        heart,
-                        dx + i*unit,
-                        dy + j*unit,
-                        0
-                    );
+                al_draw_scaled_bitmap(
+                    algif_get_frame_bitmap(
+                        candy_gif, gif_count / 6 % candy_gif->frames_count),
+                    175,
+                    211,
+                    140,
+                    140,
+                    dx + i*unit,
+                    dy + j*unit,
+                    unit,
+                    unit,
+                    0
+                );
             }
         }
     }

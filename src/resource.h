@@ -12,6 +12,8 @@ extern ALGIF_ANIMATION *JH_gif; // Johnny hurt
 extern ALGIF_ANIMATION *JJ_gif; // Johnny jump
 extern ALGIF_ANIMATION *Queen_gif; // Queen
 extern ALGIF_ANIMATION *Lightening_gif; // Lightning
+extern ALGIF_ANIMATION *candy_gif; // Candy
+extern ALGIF_ANIMATION *warn_gif; // warn
 extern ALLEGRO_FONT *score;
 extern ALLEGRO_FONT *result_score;
 extern ALLEGRO_BITMAP *infinite_png;
