@@ -43,6 +43,7 @@ void game_init() {
 void game_destroy() {}
 
 int game_process(ALLEGRO_EVENT event) {
+
     if (player.state == PLAYER_DIE) {
         if (al_get_time() - die_count_begin >= 2) {
             return MSG_GAME_OVER;
@@ -96,7 +97,11 @@ int game_process(ALLEGRO_EVENT event) {
         if (counter == 150) {
             //生成皇后
             //變數可以調整，要隨著時間調整也行
-            queens_process(1 + queens_num / 5);
+            queens_process(1 + queens_num / 8);
+            //candy
+            if(number%5==0)
+                candy_process();
+
         } else if (counter == 20) {
             al_stop_sample_instance(lightning_spi);
             al_play_sample_instance(lightning_spi);
@@ -116,6 +121,12 @@ int game_process(ALLEGRO_EVENT event) {
                 player.state = PLAYER_DIE;
                 die_count_begin = al_get_time();
                 al_play_sample_instance(dead_sound_spi);
+            }
+
+            if(board[player.x][player.y] < 0&& player.HP<3) {
+                player.HP++;
+                al_stop_sample_instance(get_candy_spi);
+                al_play_sample_instance(get_candy_spi);
             }
 
             //清空皇后
@@ -153,6 +164,13 @@ void queens_process(int n) {
     }
 }
 
+
+void candy_process(){
+    int candy=rand()%64;
+    if(board[candy%8][candy/8]==0)
+        board[candy%8][candy/8]=-100;
+}
+
 void game_draw() {
     const float unit = 86;
     const float dx = 33;
@@ -171,18 +189,27 @@ void game_draw() {
                         dy + j*unit,
                         0
                     );
-                } else if (counter <= 150) {
+                }
+
+                else if (counter <= 150) {
                     const int upper_bound = unit / 2 - 3;
                     const int lower_bound = unit / 2 - 10;
                     float a = (sin(al_get_time() * 8) + 1) / 2;
                     float r = lower_bound + (upper_bound - lower_bound) * a;
-                    al_draw_filled_rectangle(
-                        dx + (i+0.5)*unit - r,
-                        dy + (j+0.5)*unit - r,
-                        dx + (i+0.5)*unit + r,
-                        dy + (j+0.5)*unit + r,
-                        al_map_rgba(255, 0, 0, 200)
-                    );
+
+                    //mode
+                    if(easter_egg_mode){
+                        al_draw_filled_rectangle(
+                            dx + (i+0.5)*unit - r,
+                            dy + (j+0.5)*unit - r,
+                            dx + (i+0.5)*unit + r,
+                            dy + (j+0.5)*unit + r,
+                            al_map_rgba(255, 0, 0, 200)
+                        );
+                    }
+                    else {
+
+                    }
                 }
             }
             if (board[i][j] >= 90) {
@@ -199,19 +226,28 @@ void game_draw() {
                     0
                 );
             }
+            //畫candy
+            if (board[i][j] < 0) {
+                al_draw_bitmap(
+                        heart,
+                        dx + i*unit,
+                        dy + j*unit,
+                        0
+                    );
+            }
         }
     }
 
     // draw player
     if (player.state == PLAYER_IDLE) {
         al_draw_bitmap(
-            algif_get_bitmap(JI_gif, al_get_time() - j_idle_begin_time),
+            algif_get_bitmap(JI_gif, al_get_time()),
             dx + player.x*unit,
             dy + player.y*unit,
             player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
     } else if(player.state == PLAYER_ROLL){
         al_draw_bitmap(
-            algif_get_bitmap(JJ_gif, al_get_time() - j_idle_begin_time),
+            algif_get_bitmap(JJ_gif, player.frame/21.0*0.84),
             dx + (player.x*(player.frame/21.0)+player.ox*(1-player.frame/21.0))*unit,
             dy + (player.y*(player.frame/21.0)+player.oy*(1-player.frame/21.0))*unit,
             player.dir == DIR_LEFT ? ALLEGRO_FLIP_HORIZONTAL : 0);
@@ -248,6 +284,10 @@ void heart_draw() {
 void score_draw() {
     if (player.HP > 0) {
         number = al_get_time() - game_begin_time;
+        if(!easter_egg_mode){
+            number = (al_get_time() - game_begin_time)*3;
+        }
     }
+
     al_draw_textf(score, al_map_rgb(255,255,255), 400, 55, ALLEGRO_ALIGN_LEFT,  "Score: %3d", number);
 }

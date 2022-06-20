@@ -39,27 +39,31 @@
 			<Add option="-std=c99" />
 			<Add directory="allegro/include" />
 		</Compiler>
-		<Unit filename="algif5/src/algif.c">
+		<Unit filename="src/about.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="algif5/src/algif.h" />
-		<Unit filename="algif5/src/bitmap.c">
+		<Unit filename="src/about.h" />
+		<Unit filename="src/algif.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="algif5/src/gif.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="algif5/src/lzw.c">
+		<Unit filename="src/algif.h" />
+		<Unit filename="src/bitmap.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/game.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/game.h" />
+		<Unit filename="src/gif.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/global.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/global.h" />
+		<Unit filename="src/lzw.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
