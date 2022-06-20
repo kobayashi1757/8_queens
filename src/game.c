@@ -43,6 +43,33 @@ void game_init() {
 
 void game_destroy() {}
 
+void queens_process(int n) {
+    int x, y, num;
+    for(int i=0; i<n; i++){
+        num = rand() % 64;
+        x = num / 8;
+        y = num % 8;
+        for(int col=0;col<8;col++){
+            board[y][col]++;
+        }
+        for(int row=0;row<8;row++){
+            board[row][x]++;
+            for(int col=0;col<8;col++){
+                if(row+col==x+y||row-col==y-x){
+                    board[row][col]++;
+                }
+            }
+        }//只要有攻擊到就+1
+        board[y][x]=100;//rand之後把有皇后的點的值改為30
+    }
+}
+
+void candy_process(){
+    int candy=rand()%64;
+    if(board[candy%8][candy/8]==0)
+        board[candy%8][candy/8]=-100;
+}
+
 int game_process(ALLEGRO_EVENT event) {
 
     if (player.state == PLAYER_DIE) {
@@ -57,6 +84,14 @@ int game_process(ALLEGRO_EVENT event) {
         event.keyboard.keycode == ALLEGRO_KEY_W &&
         player.HP > 0) {
         --player.HP;
+    }
+
+    if(player.state == PLAYER_IDLE && board[player.x][player.y] < 0) {
+        if (player.HP < 3)
+            player.HP++;
+        board[player.x][player.y] = 0;
+        al_stop_sample_instance(get_candy_spi);
+        al_play_sample_instance(get_candy_spi);
     }
 
     // player idle
@@ -125,12 +160,6 @@ int game_process(ALLEGRO_EVENT event) {
                 al_play_sample_instance(dead_sound_spi);
             }
 
-            if(board[player.x][player.y] < 0&& player.HP<3) {
-                player.HP++;
-                al_stop_sample_instance(get_candy_spi);
-                al_play_sample_instance(get_candy_spi);
-            }
-
             //清空皇后
             for(int i=0; i<8; i++){
                 for(int j=0; j<8; j++){
@@ -145,32 +174,25 @@ int game_process(ALLEGRO_EVENT event) {
     return MSG_NOPE;
 }
 
-void queens_process(int n) {
-    int x, y, num;
-    for(int i=0; i<n; i++){
-        num = rand() % 64;
-        x = num / 8;
-        y = num % 8;
-        for(int col=0;col<8;col++){
-            board[y][col]++;
-        }
-        for(int row=0;row<8;row++){
-            board[row][x]++;
-            for(int col=0;col<8;col++){
-                if(row+col==x+y||row-col==y-x){
-                    board[row][col]++;
-                }
-            }
-        }//只要有攻擊到就+1
-        board[y][x]=100;//rand之後把有皇后的點的值改為30
-    }
+void heart_draw() {
+    const int heart_size = 60;
+    if (player.HP >= 1)
+        al_draw_scaled_bitmap(heart, 0, 0, 22, 23, 50, 50, heart_size, heart_size, 0);
+    if (player.HP >= 2)
+        al_draw_scaled_bitmap(heart, 0,0 , 22, 23, 120, 50, heart_size, heart_size, 0);
+    if (player.HP >= 3)
+        al_draw_scaled_bitmap(heart, 0,0 , 22, 23, 190, 50, heart_size, heart_size, 0);
 }
 
+void score_draw() {
+    if (player.HP > 0) {
+        number = al_get_time() - game_begin_time;
+        if(!easter_egg_mode){
+            number = (al_get_time() - game_begin_time)*3;
+        }
+    }
 
-void candy_process(){
-    int candy=rand()%64;
-    if(board[candy%8][candy/8]==0)
-        board[candy%8][candy/8]=-100;
+    al_draw_textf(score, al_map_rgb(255,255,255), 400, 55, ALLEGRO_ALIGN_LEFT,  "Score: %3d", number);
 }
 
 void game_draw() {
@@ -290,25 +312,4 @@ void game_draw() {
 
     heart_draw();
     score_draw();
-}
-
-void heart_draw() {
-    const int heart_size = 60;
-    if (player.HP >= 1)
-        al_draw_scaled_bitmap(heart, 0, 0, 22, 23, 50, 50, heart_size, heart_size, 0);
-    if (player.HP >= 2)
-        al_draw_scaled_bitmap(heart, 0,0 , 22, 23, 120, 50, heart_size, heart_size, 0);
-    if (player.HP >= 3)
-        al_draw_scaled_bitmap(heart, 0,0 , 22, 23, 190, 50, heart_size, heart_size, 0);
-}
-
-void score_draw() {
-    if (player.HP > 0) {
-        number = al_get_time() - game_begin_time;
-        if(!easter_egg_mode){
-            number = (al_get_time() - game_begin_time)*3;
-        }
-    }
-
-    al_draw_textf(score, al_map_rgb(255,255,255), 400, 55, ALLEGRO_ALIGN_LEFT,  "Score: %3d", number);
 }
